@@ -12,7 +12,7 @@ spec/*
 
 # Flutter/Dart build outputs
 build/
-.dart_tool/
+.dart_tool/*
 
 # IDE-specific files
 .idea/ .vscode/ *.iml *.ipr

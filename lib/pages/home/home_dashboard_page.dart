@@ -64,7 +64,7 @@ class HomeDashboardPage extends ConsumerWidget {
                 },
                 onSubmitted: (value) {
                   // If user submits a query, record it and open Planner tab so they can choose destination
-                  ref.read(homeSearchQueryProvider.notifier).state = value;
+                  HomeSearchStore.query.value = value;
                   HomeShell.maybeOf(context)?.setTab(2);
                 },
               ),

@@ -28,15 +28,26 @@ class _PlannerPageState extends ConsumerState<PlannerPage> {
   @override
   void initState() {
     super.initState();
-    // Listen for home search matches and pre-fill the 'To' field if not already set.
-    ref.listen<AsyncValue<String?>>(homeSearchMatchProvider, (previous, next) {
-      next.whenData((matchedId) {
-        if (matchedId != null && toStationId == null) {
-          if (!mounted) return;
-          setState(() => toStationId = matchedId);
-        }
-      });
-    });
+    // Listen to HomeSearchStore and compute a best match when user submits from Home.
+    HomeSearchStore.query.addListener(_onHomeSearchChanged);
+  }
+
+  void _onHomeSearchChanged() {
+    final q = HomeSearchStore.query.value;
+    if (q == null || q.trim().isEmpty) return;
+    // Compute best match asynchronously and prefill if possible.
+    HomeSearchStore.findBestMatch(q).then((matchedId) {
+      if (matchedId != null && toStationId == null) {
+        if (!mounted) return;
+        setState(() => toStationId = matchedId);
+      }
+    }).catchError((_) {});
+  }
+
+  @override
+  void dispose() {
+    HomeSearchStore.query.removeListener(_onHomeSearchChanged);
+    super.dispose();
   }
 
   Future<void> _findRoutes() async {
